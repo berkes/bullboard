@@ -1,9 +1,12 @@
 CMD_PREFIX=bundle exec
 TEST_FILES_PATTERN ?=
 
-.PHONY: all test lint clean setup ruby packages preprocess run
+.PHONY: all acceptance test lint clean setup ruby packages preprocess run
 
-all: test lint
+all: acceptance test lint
+
+acceptance:
+	$(CMD_PREFIX) cucumber
 
 test: export APP_ENV=test
 test:
