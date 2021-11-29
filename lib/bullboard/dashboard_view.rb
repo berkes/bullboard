@@ -8,6 +8,7 @@
 # display and format variables it recieves. No additional logic like totalling.
 class DashboardView < SimpleDelegator
   def to_s
-    "Total Buying Price: #{total_buying_price} #{currency}"
+    "Total Buying Price: #{total_buying_price} #{currency}"\
+    "Amount of positions: #{number_of_positions}"
   end
 end

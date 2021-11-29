@@ -7,7 +7,7 @@
 # and render those. As a view, it is intentially kept very dumb. It can only
 # display and format variables it recieves. No additional logic like totalling.
 class Dashboard
-  attr_reader :total_buying_price, :currency
+  attr_reader :total_buying_price, :number_of_positions, :currency
 
   ##
   # Dasboard is a model that gets initialized by feeding a list of events.
@@ -17,6 +17,9 @@ class Dashboard
   def initialize(events)
     @events = events
     @total_buying_price = 0
+    @number_of_positions = 0
+
+    @tickers = Set.new # A set is basically a unique Array in Ruby
 
     @events.each { |event| handle_event(event) }
   end
@@ -44,5 +47,11 @@ class Dashboard
 
     # Any event adds the subtotal of that event onto the "total buying price"
     @total_buying_price += event.amount * event.price
+
+    # If we haven't seen this ticker symbol yet, it is a new position,
+    # which increases the number of positions with one. And we add the
+    # ticker symbol to the list of seen symbols, for future events.
+    # uses Set.add?, which returns nil(falsey) if the item is in the set already.
+    @number_of_positions += 1 if @tickers.add?(event.ticker)
   end
 end
