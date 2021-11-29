@@ -1,27 +1,24 @@
 # frozen_string_literal: true
 
-Given('I have the following stock transactions') do |table|
-  # group by ticker symbol
-  by_ticker ||= Hash.new { |h, k| h[k] = [] }
-  table.symbolic_hashes.each do |row|
-    by_ticker[row[:ticker]] << row
-  end
+Given('I have the following stock transactions') do |transactions|
+  # Cucumber internals: our table has only Strings, and we need
+  # the price and amount to be integers; otherwise adding and multiplying
+  # will do weird things (Yes, in Ruby you can accidentally multiply or add
+  # Strings)
+  transactions.map_column!('Amount', &:to_i)
+  transactions.map_column!('Price', &:to_i)
 
-  # INK: we already introduced an aggregate and the concept of Positions.
-  # But nothing in te feature talks about that. Should we not just create events
-  # and pass them into a Dashboard which is then decorated by a dashboard?
-  @positions ||= []
-  by_ticker.each do |ticker, rows|
-    currency = rows.first[:currency]
-    position = Position.new(ticker: ticker, currency: currency)
-    rows.each { |row| position.add_transaction(amount: row[:amount].to_i, price: row[:price].to_i) }
-    @positions << position
+  @events = []
+  transactions.symbolic_hashes.each do |row|
+    @events << StocksBought.new(row)
   end
 end
 
 When('I check my dashboard') do
-  total_buying_price = @positions.reduce(0) { |sum, position| sum + position.total_buying_price }
-  @output = DashboardView.new(total_buying_price: total_buying_price, currency: 'USD')
+  dashboard = Dashboard.new(@events)
+  # This has nothing to do with EventSourcing. But we want to keep
+  # logic separated from display so we can follow along easier.
+  @output = DashboardView.new(dashboard)
 end
 
 Then('I should see {string}') do |price|

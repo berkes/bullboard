@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 # Domain
-require 'bullboard/position'
+require 'bullboard/stocks_bought'
+require 'bullboard/dashboard'
 
 # Adapters
 # View Adapter
