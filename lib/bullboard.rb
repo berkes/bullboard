@@ -2,6 +2,7 @@
 
 # Domain
 require 'bullboard/stocks_bought'
+require 'bullboard/dividend_paid'
 require 'bullboard/dashboard'
 
 # Adapters

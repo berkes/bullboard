@@ -23,4 +23,13 @@ Feature: Dashboard
     When I check my dashboard
     Then I should see "Amount of positions: 3"
 
-
+  Scenario: Dividend
+    Given I have the following stock transactions
+      | Ticker  | Currency | Amount  | Price |
+      | MSFT    | USD      | 5       | 60    |
+    And "MSFT" pays "0.62 USD" dividend per share on "17-11-2021"
+    And I have the following stock transactions
+      | Ticker  | Currency | Amount  | Price |
+      | MSFT    | USD      | 15      | 60    |
+    When I check my dashboard
+    Then I should see "Total dividend: 3.10 USD"

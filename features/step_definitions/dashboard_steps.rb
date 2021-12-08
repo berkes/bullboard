@@ -1,5 +1,11 @@
 # frozen_string_literal: true
 
+require 'bigdecimal'
+
+Before do
+  @events = []
+end
+
 Given('I have the following stock transactions') do |transactions|
   # Cucumber internals: our table has only Strings, and we need
   # the price and amount to be integers; otherwise adding and multiplying
@@ -8,10 +14,16 @@ Given('I have the following stock transactions') do |transactions|
   transactions.map_column!('Amount', &:to_i)
   transactions.map_column!('Price', &:to_i)
 
-  @events = []
   transactions.symbolic_hashes.each do |row|
     @events << StocksBought.new(row)
   end
+end
+
+Given('{string} pays {string} dividend per share on {string}') do |ticker, amount, _date|
+  (amount_dec, currency) = amount.split(' ')
+  amount_cents = (BigDecimal(amount_dec) * 100).to_i
+
+  @events << DividendPaid.new(ticker: ticker, amount: amount_cents, currency: currency)
 end
 
 When('I check my dashboard') do

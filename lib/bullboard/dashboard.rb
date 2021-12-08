@@ -7,7 +7,7 @@
 # and render those. As a view, it is intentially kept very dumb. It can only
 # display and format variables it recieves. No additional logic like totalling.
 class Dashboard
-  attr_reader :total_buying_price, :number_of_positions, :currency
+  attr_reader :total_buying_price, :number_of_positions, :total_dividend, :currency
 
   ##
   # Dasboard is a model that gets initialized by feeding a list of events.
@@ -16,11 +16,11 @@ class Dashboard
   # events: there is no public behaviour such as "add_stock" or "reduce_amount":
   def initialize(events)
     @events = events
-    @total_buying_price = 0
     @number_of_positions = 0
+    @total_dividend = 0
+    @total_buying_price = 0
 
-    @tickers = Set.new # A set is basically a unique Array in Ruby
-
+    @tickers = Hash.new(0)
     @events.each { |event| handle_event(event) }
   end
 
@@ -33,6 +33,8 @@ class Dashboard
     case event
     when StocksBought
       handle_stocks_bought(event)
+    when DividendPaid
+      handle_dividend_paid(event)
     end
   end
 
@@ -51,7 +53,19 @@ class Dashboard
     # If we haven't seen this ticker symbol yet, it is a new position,
     # which increases the number of positions with one. And we add the
     # ticker symbol to the list of seen symbols, for future events.
-    # uses Set.add?, which returns nil(falsey) if the item is in the set already.
-    @number_of_positions += 1 if @tickers.add?(event.ticker)
+    @number_of_positions += 1 unless @tickers.key?(event.ticker)
+    @tickers[event.ticker] += event.amount
+
+    nil
+  end
+
+  def handle_dividend_paid(event)
+    @currency ||= event.currency
+    # Once we get paid dividend, the event contains the amount of dividend paid
+    # *per stock*. We then look up how many of that stock we own, so we can
+    # calculate the total amount of dividend paid.
+    @total_dividend += event.amount * @tickers[event.ticker]
+
+    nil
   end
 end
