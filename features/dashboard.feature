@@ -13,6 +13,22 @@ Feature: Dashboard
     When I check my dashboard
     Then I should see "Total Buying Price: 200 USD"
 
+  Scenario: Total Value over Time
+    Given I have the following stock transactions
+      | Ticker  | Currency | Amount | Price |
+      | AAPL    | USD      | 1      | 60    |
+      | ESTC    | USD      | 3      | 20    |
+    And the prices change to the following values on "17-11-2021"
+      | Ticker  | Price |
+      | AAPL    | 71    |
+      | ESTC    | 22    |
+    And the prices change to the following values on "24-11-2021"
+      | Ticker  | Price |
+      | AAPL    | 80    |
+      | ESTC    | 19    |
+    When I check my dashboard
+    Then I should see "Total Value: 137 USD"
+
   Scenario: Total Positions
     Given I have the following stock transactions
       | Ticker  | Currency | Amount  | Price |
@@ -33,3 +49,4 @@ Feature: Dashboard
       | MSFT    | USD      | 15      | 60    |
     When I check my dashboard
     Then I should see "Total dividend: 3.10 USD"
+

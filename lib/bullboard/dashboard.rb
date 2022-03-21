@@ -20,8 +20,13 @@ class Dashboard
     @total_dividend = 0
     @total_buying_price = 0
 
+    @total_value_at = Hash.new(0)
     @tickers = Hash.new(0)
     @events.each { |event| handle_event(event) }
+  end
+
+  def total_value
+    @total_value_at.values.last
   end
 
   private
@@ -33,6 +38,8 @@ class Dashboard
     case event
     when StocksBought
       handle_stocks_bought(event)
+    when PriceObtained
+      handle_price_obtained(event)
     when DividendPaid
       handle_dividend_paid(event)
     end
@@ -55,6 +62,14 @@ class Dashboard
     # ticker symbol to the list of seen symbols, for future events.
     @number_of_positions += 1 unless @tickers.key?(event.ticker)
     @tickers[event.ticker] += event.amount
+
+    nil
+  end
+
+  def handle_price_obtained(event)
+    @currency ||= event.currency
+
+    @total_value_at[event.obtained_at] += @tickers[event.ticker] * event.price
 
     nil
   end

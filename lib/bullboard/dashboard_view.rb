@@ -13,6 +13,7 @@ class DashboardView < SimpleDelegator
 
   def to_s
     "Total Buying Price: #{total_buying_price} #{currency}"\
+    "Total Value: #{total_value} #{currency}"\
     "Amount of positions: #{number_of_positions}"\
     "Total dividend: #{total_dividend} #{currency}"
   end

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'date'
 require 'bigdecimal'
 
 Before do
@@ -24,6 +25,14 @@ Given('{string} pays {string} dividend per share on {string}') do |ticker, amoun
   amount_cents = (BigDecimal(amount_dec) * 100).to_i
 
   @events << DividendPaid.new(ticker: ticker, amount: amount_cents, currency: currency)
+end
+
+Given('the prices change to the following values on {string}') do |date, prices|
+  prices.map_column!('Price', &:to_i)
+
+  prices.symbolic_hashes.each do |row|
+    @events << PriceObtained.new(row.merge(obtained_at: DateTime.parse(date)))
+  end
 end
 
 When('I check my dashboard') do

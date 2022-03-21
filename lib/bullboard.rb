@@ -3,6 +3,7 @@
 # Domain
 require 'bullboard/stocks_bought'
 require 'bullboard/dividend_paid'
+require 'bullboard/price_obtained'
 require 'bullboard/dashboard'
 
 # Adapters
